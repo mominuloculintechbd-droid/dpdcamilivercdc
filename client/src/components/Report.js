@@ -7,9 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import ExportModal from './ExportModal';
+import { exportToExcel, exportToCSV, exportToPDF } from '../lib/exportUtils';
 
-const Report = ({ data }) => {
+const Report = ({ data, reportName = 'report' }) => {
   const [filter, setFilter] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState(null);
 
   if (!data || data.length === 0) {
     return <p>No data available for this report.</p>;
@@ -23,12 +27,58 @@ const Report = ({ data }) => {
     )
   );
 
+  const handleExportClick = (format) => {
+    setSelectedFormat(format);
+    setModalOpen(true);
+  };
+
+  const handleExport = (exportAll) => {
+    const dataToExport = exportAll ? data : filteredData;
+
+    switch (selectedFormat) {
+      case 'Excel':
+        exportToExcel(dataToExport, reportName);
+        break;
+      case 'CSV':
+        exportToCSV(dataToExport, reportName);
+        break;
+      case 'PDF':
+        exportToPDF(dataToExport, reportName);
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="p-4">
+      {/* Export Buttons */}
+      <div className="mb-4 flex gap-2 flex-wrap">
+        <button
+          onClick={() => handleExportClick('Excel')}
+          className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          Export to Excel
+        </button>
+        <button
+          onClick={() => handleExportClick('CSV')}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Export to CSV
+        </button>
+        <button
+          onClick={() => handleExportClick('PDF')}
+          className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        >
+          Export to PDF
+        </button>
+      </div>
+
+      {/* Filter Input */}
       <input
         type="text"
         placeholder="Filter..."
-        className="mb-4 p-2 border border-gray-300 rounded-md"
+        className="mb-4 p-2 border border-gray-300 rounded-md w-full"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       />
@@ -60,6 +110,16 @@ const Report = ({ data }) => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onExport={handleExport}
+        format={selectedFormat}
+        totalRows={data.length}
+        filteredRows={filteredData.length}
+      />
     </div>
   );
 };

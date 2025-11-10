@@ -32,7 +32,7 @@ const ReportPage = () => {
   return (
     <div>
       <h1>{reportName.replace(/_/g, ' ')}</h1>
-      <Report data={data} />
+      <Report data={data} reportName={reportName} />
     </div>
   );
 };

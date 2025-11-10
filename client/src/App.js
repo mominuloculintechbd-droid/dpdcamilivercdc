@@ -1,6 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import ReportPage from './pages/ReportPage';
+import { ScrollArea } from './components/ui/scroll-area';
+import { Button } from './components/ui/button';
+import { cn } from './lib/utils';
 
 const reports = [
   "active_customers_at_date",
@@ -58,25 +61,66 @@ const reports = [
   "today_disconnected_eligible_cust_count"
 ];
 
+const NavigationItem = ({ report, isActive }) => {
+  return (
+    <Link to={`/reports/${report}`} className="block">
+      <Button
+        variant="ghost"
+        className={cn(
+          "w-full justify-start text-left font-normal",
+          isActive && "bg-gray-100 text-gray-900 font-medium"
+        )}
+      >
+        {report.replace(/_/g, ' ')}
+      </Button>
+    </Link>
+  );
+};
+
+const Navigation = () => {
+  const location = useLocation();
+  const currentReport = location.pathname.split('/reports/')[1];
+
+  return (
+    <nav className="w-64 border-r border-gray-200 bg-white h-screen flex flex-col">
+      <div className="p-4 border-b border-gray-200">
+        <h2 className="text-xl font-bold text-gray-900">Reports</h2>
+        <p className="text-sm text-gray-500 mt-1">{reports.length} reports available</p>
+      </div>
+      <ScrollArea className="flex-1 px-2 py-4">
+        <div className="space-y-1">
+          {reports.map(report => (
+            <NavigationItem
+              key={report}
+              report={report}
+              isActive={currentReport === report}
+            />
+          ))}
+        </div>
+      </ScrollArea>
+    </nav>
+  );
+};
+
 const App = () => {
   return (
     <Router>
-      <div style={{ display: 'flex' }}>
-        <nav style={{ width: '250px', borderRight: '1px solid #ccc', padding: '1rem' }}>
-          <h2>Reports</h2>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {reports.map(report => (
-              <li key={report} style={{ margin: '0.5rem 0' }}>
-                <Link to={`/reports/${report}`}>{report.replace(/_/g, ' ')}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <main style={{ flex: 1, padding: '1rem' }}>
-          <Routes>
-            <Route path="/reports/:reportName" element={<ReportPage />} />
-            <Route path="/" element={<div>Select a report to view</div>} />
-          </Routes>
+      <div className="flex h-screen overflow-hidden">
+        <Navigation />
+        <main className="flex-1 overflow-auto bg-gray-50">
+          <div className="container mx-auto p-6">
+            <Routes>
+              <Route path="/reports/:reportName" element={<ReportPage />} />
+              <Route path="/" element={
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Oracle Reporting Dashboard</h1>
+                    <p className="text-gray-600">Select a report from the navigation to view data</p>
+                  </div>
+                </div>
+              } />
+            </Routes>
+          </div>
         </main>
       </div>
     </Router>

@@ -18,6 +18,7 @@ export const reportCategories = [
       'daily_bill_info',
       'datewise_total_bill_amt',
       'last_billing_date',
+      'nocs_balance_summary',
     ]
   },
   {

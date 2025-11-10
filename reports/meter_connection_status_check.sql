@@ -1,6 +1,5 @@
-select *from d1_install_evt where bo_status_cd='DISCONN-COMM';
-
--- also add Metr No.
+-- Meter connection status check
+-- Shows meters with DISCONN-COMM status
 SELECT DISTINCT 
        --a.acct_id    AS customer_id,
        g.INSTALL_EVT_ID ,

@@ -27,6 +27,37 @@ const Report = ({ data, reportName = 'report' }) => {
     )
   );
 
+  // Helper function to check if a value is numeric
+  const isNumeric = (value) => {
+    if (value === null || value === undefined || value === '') return false;
+    return !isNaN(parseFloat(value)) && isFinite(value);
+  };
+
+  // Helper function to format numbers with thousand separators
+  const formatNumber = (value) => {
+    if (!isNumeric(value)) return value;
+    return parseFloat(value).toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
+  };
+
+  // Calculate column totals for numeric columns
+  const calculateTotals = () => {
+    const totals = {};
+    headers.forEach(header => {
+      const values = filteredData.map(row => row[header]).filter(val => isNumeric(val));
+      if (values.length > 0) {
+        totals[header] = values.reduce((sum, val) => sum + parseFloat(val), 0);
+      } else {
+        totals[header] = null;
+      }
+    });
+    return totals;
+  };
+
+  const totals = calculateTotals();
+
   const handleExportClick = (format) => {
     setSelectedFormat(format);
     setModalOpen(true);
@@ -114,13 +145,45 @@ const Report = ({ data, reportName = 'report' }) => {
           </TableHeader>
           <TableBody>
             {filteredData.length > 0 ? (
-              filteredData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
-                  {headers.map((header, colIndex) => (
-                    <TableCell key={colIndex}>{row[header]}</TableCell>
-                  ))}
+              <>
+                {filteredData.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {headers.map((header, colIndex) => {
+                      const value = row[header];
+                      const numeric = isNumeric(value);
+                      return (
+                        <TableCell
+                          key={colIndex}
+                          className={numeric ? 'text-right font-mono' : ''}
+                        >
+                          {numeric ? formatNumber(value) : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+                {/* Summary Row */}
+                <TableRow className="bg-gray-100 font-bold border-t-2 border-gray-300">
+                  {headers.map((header, colIndex) => {
+                    const total = totals[header];
+                    if (colIndex === 0) {
+                      return (
+                        <TableCell key={colIndex} className="font-bold">
+                          TOTAL
+                        </TableCell>
+                      );
+                    }
+                    return (
+                      <TableCell
+                        key={colIndex}
+                        className={total !== null ? 'text-right font-mono font-bold' : ''}
+                      >
+                        {total !== null ? formatNumber(total) : ''}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
-              ))
+              </>
             ) : (
               <TableRow>
                 <TableCell colSpan={headers.length} className="h-24 text-center">

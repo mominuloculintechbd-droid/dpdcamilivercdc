@@ -1,0 +1,17 @@
+{
+  "reportName": "bill_stop",
+  "description": "Analysis of billing records that have stopped, showing customer details and meter information based on days since last billing",
+  "parameters": [
+    {
+      "name": "days_threshold",
+      "type": "number",
+      "label": "Days Since Last Bill",
+      "description": "Minimum number of days since the last billing date to include in results",
+      "default": 18,
+      "min": 1,
+      "max": 365,
+      "required": true,
+      "placeholder": "Enter number of days (e.g., 18)"
+    }
+  ]
+}

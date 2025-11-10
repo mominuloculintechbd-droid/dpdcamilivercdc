@@ -1,10 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import ReportPage from './pages/ReportPage';
+import QueryHistoryPage from './pages/QueryHistoryPage';
+import HistoryResultPage from './pages/HistoryResultPage';
 import { ScrollArea } from './components/ui/scroll-area';
 import { Button } from './components/ui/button';
 import { cn } from './lib/utils';
 import { reportCategories, isParametricReport, getAllReports } from './config/reportCategories';
+import notificationManager from './lib/notificationManager';
 
 const NavigationItem = ({ report, isActive, searchTerm }) => {
   const reportName = report.replace(/_/g, ' ');
@@ -46,7 +50,24 @@ const NavigationItem = ({ report, isActive, searchTerm }) => {
 const Navigation = () => {
   const location = useLocation();
   const currentReport = location.pathname.split('/reports/')[1];
+  const isHistoryPage = location.pathname.startsWith('/history');
   const [searchTerm, setSearchTerm] = useState('');
+  const [badgeCount, setBadgeCount] = useState(0);
+
+  // Listen for badge count updates
+  useEffect(() => {
+    const updateBadge = () => {
+      const count = notificationManager.getUnviewedCount();
+      setBadgeCount(count);
+    };
+
+    window.addEventListener('badgeCountUpdated', updateBadge);
+    updateBadge(); // Initial load
+
+    return () => {
+      window.removeEventListener('badgeCountUpdated', updateBadge);
+    };
+  }, []);
 
   // Filter reports based on search term
   const filteredCategories = useMemo(() => {
@@ -77,6 +98,27 @@ const Navigation = () => {
         <p className="text-sm text-gray-500 mt-1">
           {searchTerm ? `${filteredCount} of ${totalReports}` : `${totalReports} reports available`}
         </p>
+      </div>
+
+      {/* Query History Link */}
+      <div className="p-3 border-b border-gray-200">
+        <Link to="/history" className="block">
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start text-left font-normal text-sm",
+              isHistoryPage && "bg-gray-100 text-gray-900 font-medium"
+            )}
+          >
+            <span className="mr-2">📋</span>
+            <span>Query History</span>
+            {badgeCount > 0 && (
+              <span className="ml-auto bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {badgeCount}
+              </span>
+            )}
+          </Button>
+        </Link>
       </div>
 
       {/* Search Input */}
@@ -158,6 +200,16 @@ const Navigation = () => {
 };
 
 const App = () => {
+  // Initialize notification system on mount
+  useEffect(() => {
+    notificationManager.initialize();
+    notificationManager.loadCompletedJobs();
+
+    return () => {
+      notificationManager.cleanup();
+    };
+  }, []);
+
   return (
     <Router>
       <div className="flex h-screen overflow-hidden">
@@ -166,6 +218,8 @@ const App = () => {
           <div className="container mx-auto p-6">
             <Routes>
               <Route path="/reports/:reportName" element={<ReportPage />} />
+              <Route path="/history" element={<QueryHistoryPage />} />
+              <Route path="/history/:jobId" element={<HistoryResultPage />} />
               <Route path="/" element={
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
@@ -178,6 +232,8 @@ const App = () => {
           </div>
         </main>
       </div>
+      {/* Toast notification container */}
+      <Toaster />
     </Router>
   );
 };

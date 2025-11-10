@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import Report from '../components/Report';
 import { Spinner } from '../components/ui/spinner';
 import { Skeleton } from '../components/ui/skeleton';
@@ -69,6 +70,39 @@ const ReportPage = () => {
       setError(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const executeInBackground = async (parameters) => {
+    try {
+      const response = await axios.post(`http://localhost:3001/api/reports/${reportName}/execute`, {
+        parameters
+      });
+
+      const { jobId } = response.data;
+
+      // Show success toast
+      toast.success(
+        <div>
+          <div className="font-medium">Report started in background</div>
+          <div className="text-sm">Check Query History to view results</div>
+        </div>,
+        {
+          duration: 5000,
+          action: {
+            label: 'View History',
+            onClick: () => navigate('/history')
+          }
+        }
+      );
+
+      // Navigate to history page
+      setTimeout(() => {
+        navigate('/history');
+      }, 1000);
+    } catch (err) {
+      console.error('Error starting background execution:', err);
+      toast.error('Failed to start background execution: ' + err.message);
     }
   };
 
@@ -152,17 +186,29 @@ const ReportPage = () => {
       {/* Report Content */}
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900 capitalize">
-            {reportName.replace(/_/g, ' ')}
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {data?.length || 0} rows retrieved
-            {metadata && metadata.parameters && metadata.parameters.length > 0 && (
-              <span className="ml-2 text-blue-600">
-                (Parametric report)
-              </span>
-            )}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 capitalize">
+                {reportName.replace(/_/g, ' ')}
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {data?.length || 0} rows retrieved
+                {metadata && metadata.parameters && metadata.parameters.length > 0 && (
+                  <span className="ml-2 text-blue-600">
+                    (Parametric report)
+                  </span>
+                )}
+              </p>
+            </div>
+            <button
+              onClick={() => executeInBackground({})}
+              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm font-medium flex items-center gap-2"
+              title="Run this report in the background and check results in Query History"
+            >
+              <span>🚀</span>
+              <span>Run in Background</span>
+            </button>
+          </div>
         </div>
         <Report data={data} reportName={reportName} />
       </div>

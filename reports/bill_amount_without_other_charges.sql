@@ -12,5 +12,5 @@ and a.sp_id=b.sp_id and c.sa_id=b.sa_id and c.sa_type_cd='PPD'
 and c.sa_Status_flg='20' and b1.bseg_id=b2.bseg_id and b2.sa_id=c.sa_id  AND b2.bseg_stat_flg='50'  
 and b1.calc_rule_cd not in ('SUM_OF_CHARGES','CM_SUM_OF_CHG','CM_INSTLMENT_AMT','CM_MTR_RENT','DMD_CHR_LT_MT','DMD_CHR_LT_MT','CM_MTR_RENT',
 'CM_INSTLMENT_AMT','ADD_LD_CHR','E_LTARES_NLL','E_TM_NLL')
-and trunc(b2.end_dt) < = '11-Nov-2024' 
-group by a.srch_char_val, g.id_value,e.D1_REMOVAL_DTTM;
+and trunc(b2.end_dt) < = '11-Nov-2024'
+group by a.srch_char_val, g.id_value,e.D1_REMOVAL_DTTM

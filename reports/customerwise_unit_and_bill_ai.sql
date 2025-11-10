@@ -29,4 +29,4 @@ INNER JOIN d1_dvc_cfg h ON h.DEVICE_CONFIG_ID = g.DEVICE_CONFIG_ID
 INNER JOIN d1_dvc_identifier i ON i.D1_DEVICE_ID = h.D1_DEVICE_ID
 INNER JOIN ci_acct_per ab ON ab.acct_id = a.acct_id
 INNER JOIN CI_PER_NAME bc ON bc.per_id = ab.per_id
-GROUP BY a.acct_id, b.sa_id, i.id_value, f.srch_char_val, bc.entity_name;
+GROUP BY a.acct_id, b.sa_id, i.id_value, f.srch_char_val, bc.entity_name

@@ -117,7 +117,7 @@ async function executeReport(reportName, parameters, res) {
     if (error.code === 'ENOENT') {
       res.status(404).send('Report not found');
     } else {
-      console.error('Error executing report:', error);
+      console.error(`Error executing report "${reportName}":`, error);
       res.status(500).send('Error executing report: ' + error.message);
     }
   }

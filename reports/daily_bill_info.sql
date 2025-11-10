@@ -130,4 +130,4 @@ LEFT JOIN BILLING B ON D.report_date = B.report_date
 
 LEFT JOIN KWH_READS K ON D.report_date = K.report_date
 
-ORDER BY D.report_date;
+ORDER BY D.report_date

@@ -9,4 +9,4 @@ inner join d1_dvc_identifier d2 on d1.d1_device_id=d2.d1_device_id
 inner join ci_sp s on s.sp_id=c.sp_id
 inner join ci_prem_char k on k.prem_id=s.prem_id
 inner join CI_CHAR_VAL_L l on k.char_val=l.char_val
-where s1.ADHOC_CHAR_VAL in ('17736352') and k.char_type_cd='CM_NOCS';
+where s1.ADHOC_CHAR_VAL in ('17736352') and k.char_type_cd='CM_NOCS'

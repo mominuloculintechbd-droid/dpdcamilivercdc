@@ -27,6 +27,6 @@ INNER JOIN ci_acct a
     ON a.acct_id = b.acct_id
 INNER JOIN d1_dvc_cfg h 
     ON h.device_config_id = g.device_config_id
-INNER JOIN d1_dvc_identifier i 
+INNER JOIN d1_dvc_identifier i
     ON i.d1_device_id = h.d1_device_id
-WHERE g.bo_status_cd = 'DISCONN-COMM';
+WHERE g.bo_status_cd = 'DISCONN-COMM'

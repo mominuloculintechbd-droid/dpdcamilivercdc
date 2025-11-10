@@ -37,4 +37,4 @@ and f2.d1_sp_id=s1.d1_sp_id and  f3.bus_obj_cd ='D1-Transformer'
 and f2.facility_id=f1.facility_id and f3.facility_id=f1.facility_id
 and n1.facility_id=f1.facility_id and n1.network_location_id=n2.network_location_id
 and n2.network_node=r1.facility_id and r1.facility_id=l2.facility_id
-) table1;
+) table1

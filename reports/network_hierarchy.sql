@@ -14,4 +14,4 @@ and n1.facility_id=f1.facility_id )sql2
 where sql1.feeder=sql2.feeder
 and transformerCode in (
 'D2Y37')
-order by substation ,sql1.feeder;
+order by substation ,sql1.feeder

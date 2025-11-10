@@ -38,4 +38,4 @@ and e.measr_comp_id=s1.measr_comp_id
 
 and s1.end_dttm=e.msrmt_dttm
 
-order by DATEOFMIGRATION asc;
+order by DATEOFMIGRATION asc

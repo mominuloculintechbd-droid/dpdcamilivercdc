@@ -16,4 +16,4 @@ inner join d1_dvc_cfg h on h.DEVICE_CONFIG_ID=g.DEVICE_CONFIG_ID
 inner join d1_dvc_identifier i on i.D1_DEVICE_ID=h.D1_DEVICE_ID
 inner join ci_acct_per ab on ab.acct_id=a.acct_id
 inner join CI_PER_NAME bc on bc.per_id=ab.per_id
-group by i.id_value ,f.srch_char_val,g.bo_status_cd,h.DEVICE_CONFIG_TYPE_CD,a.acct_id,b.sa_id,bc.entity_name;
+group by i.id_value ,f.srch_char_val,g.bo_status_cd,h.DEVICE_CONFIG_TYPE_CD,a.acct_id,b.sa_id,bc.entity_name

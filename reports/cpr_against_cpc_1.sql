@@ -29,4 +29,4 @@ where h.id_value in (
           and e1.d1_removal_dttm is null
           and length(d2.id_value) = 8
     )
-order by d.adhoc_char_val;
+order by d.adhoc_char_val

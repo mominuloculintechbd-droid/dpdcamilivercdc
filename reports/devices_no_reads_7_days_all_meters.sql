@@ -8,7 +8,7 @@ and a.device_config_id=c.device_config_id
 and c.D1_REMOVAL_DTTM IS NULL
 and s1.d1_sp_id=C.D1_SP_ID
 and s1.char_type_cd='CM_LEGCY' and s1.adhoc_char_val not like '%BAD%'
-and f.d1_device_id=t1.d1_device_id 
-and f.BO_STATUS_CD = 'ACTIVE' 
+and f.d1_device_id=t1.d1_device_id
+and f.BO_STATUS_CD = 'ACTIVE'
 and f.device_config_id=a.device_config_id
-and t1.dvc_id_type_flg='D1SN';
+and t1.dvc_id_type_flg='D1SN'

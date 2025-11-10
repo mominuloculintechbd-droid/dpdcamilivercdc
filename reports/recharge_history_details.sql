@@ -14,4 +14,4 @@ and e.d1_sp_id=s1.d1_sp_id and s1.SP_ID_TYPE_FLG='D1EP'
 AND S1.ID_VALUE=p.PREM_ID
 and p.char_type_cd='CM_NOCS' and p.char_val=l.char_val
 and A.ACCT_ID=t1.payor_acct_id
-order by t2.CRE_DTTM desc;
+order by t2.CRE_DTTM desc

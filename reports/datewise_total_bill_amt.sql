@@ -7,5 +7,5 @@ inner join ci_bseg t4 on t4.sa_id = t1.sa_id and t4.bseg_stat_flg='50'
 inner join ci_bseg_sq t5 on t5.bseg_id=t4.bseg_id and uom_cd='KWH' and tou_cd = ' '
 inner join ci_bseg_calc t6 on t6.bseg_id = t4.bseg_id --and t4.bseg_id='320999801319'
 where sa_type_cd='PPD'--t1.sa_id='1147261448'
-and t4.start_dt between  '11-OCT-12' and '12-OCT-12' 
-group by t3.srch_char_val, t4.start_dt;
+and t4.start_dt between  '11-OCT-12' and '12-OCT-12'
+group by t3.srch_char_val, t4.start_dt

@@ -15,4 +15,4 @@ where s1.char_type_cd='CM_CPRLA' and s1.adhoc_char_val='32359610'
 and s1.d1_sp_id=e1.d1_sp_id and e1.d1_removal_dttm is null
 and d1.device_config_id=e1.device_config_id
 and d2.d1_device_id=d1.d1_device_id
-and length(d2.id_value)='8');
+and length(d2.id_value)='8')

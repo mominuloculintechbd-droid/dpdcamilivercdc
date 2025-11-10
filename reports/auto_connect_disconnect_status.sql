@@ -12,4 +12,4 @@ inner join d1_install_evt g on g.d1_sp_id=f.d1_sp_id and g.d1_removal_dttm is nu
 inner join d1_dvc_cfg h on h.DEVICE_CONFIG_ID=g.DEVICE_CONFIG_ID
 inner join d1_dvc_identifier i on i.D1_DEVICE_ID=h.D1_DEVICE_ID
 group by i.id_value ,f.srch_char_val,g.bo_status_cd,h.DEVICE_CONFIG_TYPE_CD,a.acct_id,b.sa_id
-order by g.bo_status_cd desc;
+order by g.bo_status_cd desc

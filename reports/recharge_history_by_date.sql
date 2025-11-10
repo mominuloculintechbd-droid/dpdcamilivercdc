@@ -1,2 +1,2 @@
 select * from cisadm.f1_fact PARTITION (P2025SEP) where bus_obj_cd='CM_MAKPAYINFO' and TRUNC(status_upd_dttm)= TO_DATE('2025-08-26','YYYY-MM-DD');
-select Count(*) from cisadm.f1_fact PARTITION (P2025SEP) where bus_obj_cd='CM_MAKPAYINFO' and TRUNC(status_upd_dttm)= TO_DATE('2025-08-26','YYYY-MM-DD');
+select Count(*) from cisadm.f1_fact PARTITION (P2025SEP) where bus_obj_cd='CM_MAKPAYINFO' and TRUNC(status_upd_dttm)= TO_DATE('2025-08-26','YYYY-MM-DD')

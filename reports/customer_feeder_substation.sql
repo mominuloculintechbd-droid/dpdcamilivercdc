@@ -81,4 +81,4 @@ WHERE
     AND n1.facility_id = f1.facility_id
     AND n1.network_location_id = n2.network_location_id
     AND n2.network_node = r1.facility_id
-    AND r1.facility_id = l2.facility_id;
+    AND r1.facility_id = l2.facility_id

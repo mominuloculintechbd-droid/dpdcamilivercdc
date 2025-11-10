@@ -178,4 +178,4 @@ GROUP BY
     c.msrmt_dttm,
     c.bill_cycle_cd
 ORDER BY
-    1;
+    1

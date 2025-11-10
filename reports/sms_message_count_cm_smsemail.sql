@@ -1,1 +1,1 @@
-select count(*) from f1_outmsg PARTITION (P2025AUG) where NT_XID_CD='CM_SMSEMAIL';
+select count(*) from f1_outmsg PARTITION (P2025AUG) where NT_XID_CD='CM_SMSEMAIL'

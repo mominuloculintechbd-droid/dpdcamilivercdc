@@ -34,4 +34,4 @@ and s4.char_type_cd='CM-DISNT' and s4.srch_char_val=n1.facility_id
 and n1.network_location_id=n2.network_location_id and n2.network_node_type_flg='D1-Feeder'
 and n2.network_node=f1.facility_id
 group by d.cont_qty,e.sa_type_cd,e.acct_id,PC1.CHAR_vAL,s1.adhoc_char_val,d2.id_value,f1.id_value,p1.address1)
-WHERE  MaximumDemand>SaanctionLoad;
+WHERE  MaximumDemand>SaanctionLoad

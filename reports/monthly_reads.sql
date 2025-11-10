@@ -18,4 +18,4 @@ WHERE
     AND ms.MSRMT_DTTM IN (
         TO_DATE('2024-11-01', 'YYYY-MM-DD'),
         TO_DATE('2024-12-01', 'YYYY-MM-DD'),
-        TO_DATE('2024-08-01', 'YYYY-MM-DD'));
+        TO_DATE('2024-08-01', 'YYYY-MM-DD'))

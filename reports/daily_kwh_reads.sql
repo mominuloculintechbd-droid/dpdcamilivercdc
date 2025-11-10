@@ -6,4 +6,4 @@ and E.MSRMT_DTTM='2024-12-15' and trunc(e.cre_dttm)='2024-12-15'
 and a.measr_comp_id=b.measr_comp_id
 and a.ID_VALUE in ('kWh Daily')
 and b.DEVICE_CONFIG_ID=c.DEVICE_CONFIG_ID
-and c.D1_DEVICE_ID=d.D1_DEVICE_ID and d.DVC_ID_TYPE_FLG='D1SN';
+and c.D1_DEVICE_ID=d.D1_DEVICE_ID and d.DVC_ID_TYPE_FLG='D1SN'

@@ -1,0 +1,17 @@
+{
+  "reportName": "customer_overload_last_months",
+  "description": "Customers whose maximum KW demand exceeded their sanctioned load in the last N months, showing detailed customer information and month-by-month demand readings",
+  "parameters": [
+    {
+      "name": "months_back",
+      "type": "number",
+      "label": "Number of Months",
+      "description": "How many months back to analyze for overload detection (e.g., 3 for last 3 months)",
+      "default": 3,
+      "min": 1,
+      "max": 12,
+      "required": true,
+      "placeholder": "Enter number of months (1-12)"
+    }
+  ]
+}

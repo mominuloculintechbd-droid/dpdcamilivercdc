@@ -4,6 +4,8 @@ SELECT
     nocsDescr AS nocs_name,
     NOCS AS nocs_code,
     COUNT(*) AS total_customers,
+    SUM(CASE WHEN amount > 0 THEN 1 ELSE 0 END) AS customers_with_positive_balance,
+    SUM(CASE WHEN amount < 0 THEN 1 ELSE 0 END) AS customers_with_negative_balance,
     SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS positive_balance,
     SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END) AS negative_balance,
     SUM(amount) AS net_balance

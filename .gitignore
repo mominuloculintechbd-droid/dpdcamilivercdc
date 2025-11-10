@@ -41,6 +41,7 @@ coverage/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+nul
 
 # Optional npm cache directory
 .npm

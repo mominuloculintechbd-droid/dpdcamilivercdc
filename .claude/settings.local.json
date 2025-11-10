@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /s /b \"C:\\Users\\tanvir.sulaiman\\sqlai\\client\\src\\components\\ui\" 2)",
+      "Bash(nul)",
+      "Bash(node src/server.js:*)",
+      "Bash(npm start)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(ping:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill /F /PID 26404)",
+      "Bash(taskkill /PID 26404 /F)",
+      "Bash(cmd.exe /c \"taskkill /F /PID 26404\")",
+      "Bash(powershell -Command \"Stop-Process -Id 26404 -Force\")",
+      "Bash(powershell -Command \"Stop-Process -Id 20844 -Force\")",
+      "Bash(del \"C:\\Users\\tanvir.sulaiman\\sqlai\\client\\.env\")",
+      "Bash(powershell -Command:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

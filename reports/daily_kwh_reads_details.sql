@@ -1,0 +1,2 @@
+select a.measr_comp_id,a.msrmt_dttm,a.msrmt_val,a.prev_msrmt_dttm,a.cre_dttm,a.last_update_dttm,a.reading_val from d1_msrmt partition(P2024SEP) a inner join d1_measr_comp_identifier on a.measr_comp_id=d1_measr_comp_identifier.measr_comp_id where 
+trunc(a.msrmt_dttm)='01-09-2024' and msrmt_val>100 and d1_measr_comp_identifier.id_value in ('kWh Daily')

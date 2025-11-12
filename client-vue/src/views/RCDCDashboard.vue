@@ -13,23 +13,34 @@
               <p class="text-caption text-medium-emphasis mb-0">Real-time Monitoring Dashboard</p>
             </div>
           </div>
-          <v-chip color="success" variant="flat" size="small" class="pulse-chip">
-            <v-icon start size="small">mdi-circle</v-icon>
-            Live
-          </v-chip>
+          <div class="d-flex align-center ga-2">
+            <v-btn
+              color="primary"
+              variant="outlined"
+              size="small"
+              to="/meter-wise"
+            >
+              <v-icon start size="small">mdi-gauge</v-icon>
+              Meter-wise Report
+            </v-btn>
+            <v-chip color="success" variant="flat" size="small" class="pulse-chip">
+              <v-icon start size="small">mdi-circle</v-icon>
+              Live
+            </v-chip>
+          </div>
         </div>
       </div>
     </v-app-bar>
 
     <!-- Error Alert -->
-    <div v-if="error" class="alert-container">
+    <div v-if="reportsStore.analyticsError" class="alert-container">
       <div class="max-width-container">
         <v-alert
           type="error"
           variant="tonal"
           closable
           class="my-4"
-          @click:close="error = null"
+          @click:close="reportsStore.analyticsError = null"
         >
           <v-alert-title class="font-weight-bold">Database Connection Error</v-alert-title>
           <div class="mt-2">
@@ -39,7 +50,7 @@
               <li>Network connectivity to database server</li>
               <li>Database credentials are correct</li>
             </ul>
-            <p class="text-caption mt-2 font-mono">{{ error }}</p>
+            <p class="text-caption mt-2 font-mono">{{ reportsStore.analyticsError }}</p>
           </div>
         </v-alert>
       </div>
@@ -66,9 +77,9 @@
                 <v-icon start size="small">mdi-calendar-today</v-icon>
                 Today's Data
               </v-chip>
-              <v-chip v-if="analytics.lastUpdated" color="white" variant="flat" size="small">
+              <v-chip v-if="reportsStore.analytics.lastUpdated" color="white" variant="flat" size="small">
                 <v-icon start size="small">mdi-clock-outline</v-icon>
-                {{ formatDateTime(analytics.lastUpdated) }}
+                {{ formatDateTime(reportsStore.analytics.lastUpdated) }}
               </v-chip>
             </div>
           </v-col>
@@ -76,7 +87,7 @@
             <v-btn
               color="white"
               size="large"
-              :loading="loading"
+              :loading="reportsStore.analyticsLoading"
               @click="fetchData"
               elevation="0"
               rounded="pill"
@@ -106,7 +117,7 @@
                 </v-avatar>
                 <div class="ml-3">
                   <p class="text-caption text-medium-emphasis mb-0">Total Commands</p>
-                  <h2 class="text-h4 font-weight-bold">{{ analytics.totalCommands }}</h2>
+                  <h2 class="text-h4 font-weight-bold">{{ reportsStore.analytics.totalCommands }}</h2>
                 </div>
               </div>
               <v-progress-linear color="deep-purple" :model-value="100" height="4" rounded></v-progress-linear>
@@ -125,13 +136,13 @@
                 <div class="ml-3">
                   <p class="text-caption text-medium-emphasis mb-0">RC Success Rate</p>
                   <h2 class="text-h4 font-weight-bold text-green">
-                    {{ calculateSuccessRate(analytics.rcSuccess, analytics.rcSuccess + analytics.rcInProgress) }}%
+                    {{ calculateSuccessRate(reportsStore.analytics.rcSuccess, reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress) }}%
                   </h2>
                 </div>
               </div>
               <v-progress-linear
                 color="green"
-                :model-value="parseFloat(calculateSuccessRate(analytics.rcSuccess, analytics.rcSuccess + analytics.rcInProgress))"
+                :model-value="parseFloat(calculateSuccessRate(reportsStore.analytics.rcSuccess, reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress))"
                 height="4"
                 rounded
               ></v-progress-linear>
@@ -150,13 +161,13 @@
                 <div class="ml-3">
                   <p class="text-caption text-medium-emphasis mb-0">DC Success Rate</p>
                   <h2 class="text-h4 font-weight-bold text-blue">
-                    {{ calculateSuccessRate(analytics.dcSuccess, analytics.dcSuccess + analytics.dcInProgress + analytics.dcFailed) }}%
+                    {{ calculateSuccessRate(reportsStore.analytics.dcSuccess, reportsStore.analytics.dcSuccess + reportsStore.analytics.dcInProgress + reportsStore.analytics.dcFailed) }}%
                   </h2>
                 </div>
               </div>
               <v-progress-linear
                 color="blue"
-                :model-value="parseFloat(calculateSuccessRate(analytics.dcSuccess, analytics.dcSuccess + analytics.dcInProgress + analytics.dcFailed))"
+                :model-value="parseFloat(calculateSuccessRate(reportsStore.analytics.dcSuccess, reportsStore.analytics.dcSuccess + reportsStore.analytics.dcInProgress + reportsStore.analytics.dcFailed))"
                 height="4"
                 rounded
               ></v-progress-linear>
@@ -175,13 +186,13 @@
                 <div class="ml-3">
                   <p class="text-caption text-medium-emphasis mb-0">Overall Success</p>
                   <h2 class="text-h4 font-weight-bold text-orange">
-                    {{ calculateSuccessRate(analytics.rcSuccess + analytics.dcSuccess, analytics.totalCommands) }}%
+                    {{ calculateSuccessRate(reportsStore.analytics.rcSuccess + reportsStore.analytics.dcSuccess, reportsStore.analytics.totalCommands) }}%
                   </h2>
                 </div>
               </div>
               <v-progress-linear
                 color="orange"
-                :model-value="parseFloat(calculateSuccessRate(analytics.rcSuccess + analytics.dcSuccess, analytics.totalCommands))"
+                :model-value="parseFloat(calculateSuccessRate(reportsStore.analytics.rcSuccess + reportsStore.analytics.dcSuccess, reportsStore.analytics.totalCommands))"
                 height="4"
                 rounded
               ></v-progress-linear>
@@ -208,7 +219,7 @@
                     <v-icon color="success" size="20" class="mr-2">mdi-check-circle</v-icon>
                     <span class="text-overline font-weight-bold">Completed</span>
                   </div>
-                  <h1 class="text-h2 font-weight-bold text-success">{{ analytics.rcSuccess }}</h1>
+                  <h1 class="text-h2 font-weight-bold text-success">{{ reportsStore.analytics.rcSuccess }}</h1>
                   <p class="text-caption text-medium-emphasis mt-1">Successfully connected</p>
                 </div>
                 <v-avatar color="success-lighten-4" size="80">
@@ -218,7 +229,7 @@
               <v-divider class="my-3"></v-divider>
               <div class="text-caption text-medium-emphasis">
                 <v-icon size="16" class="mr-1">mdi-trending-up</v-icon>
-                {{ analytics.rcSuccess }} of {{ analytics.rcSuccess + analytics.rcInProgress }} total
+                {{ reportsStore.analytics.rcSuccess }} of {{ reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress }} total
               </div>
             </v-card-text>
           </v-card>
@@ -233,7 +244,7 @@
                     <v-icon color="warning" size="20" class="mr-2">mdi-clock-outline</v-icon>
                     <span class="text-overline font-weight-bold">In Progress</span>
                   </div>
-                  <h1 class="text-h2 font-weight-bold text-warning">{{ analytics.rcInProgress }}</h1>
+                  <h1 class="text-h2 font-weight-bold text-warning">{{ reportsStore.analytics.rcInProgress }}</h1>
                   <p class="text-caption text-medium-emphasis mt-1">Currently processing</p>
                 </div>
                 <v-avatar color="warning-lighten-4" size="80">
@@ -268,7 +279,7 @@
                     <v-icon color="success" size="18" class="mr-1">mdi-check-circle</v-icon>
                     <span class="text-caption font-weight-bold">COMPLETED</span>
                   </div>
-                  <h1 class="text-h3 font-weight-bold text-success">{{ analytics.dcSuccess }}</h1>
+                  <h1 class="text-h3 font-weight-bold text-success">{{ reportsStore.analytics.dcSuccess }}</h1>
                 </div>
                 <v-avatar color="success-lighten-4" size="56">
                   <v-icon color="success" size="28">mdi-check</v-icon>
@@ -287,7 +298,7 @@
                     <v-icon color="warning" size="18" class="mr-1">mdi-clock-outline</v-icon>
                     <span class="text-caption font-weight-bold">IN PROGRESS</span>
                   </div>
-                  <h1 class="text-h3 font-weight-bold text-warning">{{ analytics.dcInProgress }}</h1>
+                  <h1 class="text-h3 font-weight-bold text-warning">{{ reportsStore.analytics.dcInProgress }}</h1>
                 </div>
                 <v-avatar color="warning-lighten-4" size="56">
                   <v-icon color="warning" size="28">mdi-sync</v-icon>
@@ -306,7 +317,7 @@
                     <v-icon color="error" size="18" class="mr-1">mdi-close-circle</v-icon>
                     <span class="text-caption font-weight-bold">FAILED</span>
                   </div>
-                  <h1 class="text-h3 font-weight-bold text-error">{{ analytics.dcFailed }}</h1>
+                  <h1 class="text-h3 font-weight-bold text-error">{{ reportsStore.analytics.dcFailed }}</h1>
                 </div>
                 <v-avatar color="error-lighten-4" size="56">
                   <v-icon color="error" size="28">mdi-close</v-icon>
@@ -318,7 +329,7 @@
       </v-row>
 
       <!-- NOCS-wise Report Table -->
-      <v-row v-if="nocsData.length > 0" class="mb-6">
+      <v-row v-if="reportsStore.nocsData.length > 0" class="mb-6">
         <v-col cols="12">
           <v-card elevation="3" rounded="lg" class="modern-card">
             <v-card-title class="pa-6 pb-4">
@@ -337,7 +348,7 @@
                   variant="flat"
                   size="default"
                   @click="exportToExcel"
-                  :disabled="nocsData.length === 0"
+                  :disabled="reportsStore.nocsData.length === 0"
                   rounded="lg"
                   class="download-btn"
                 >
@@ -350,7 +361,7 @@
             <v-card-text class="pa-0">
               <v-data-table
                 :headers="headers"
-                :items="nocsData"
+                :items="reportsStore.nocsData"
                 :items-per-page="10"
                 class="modern-table"
                 hover
@@ -433,46 +444,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { reportsApi } from '../services/api'
+import { useReportsStore } from '../stores/reportsStore'
 import * as XLSX from 'xlsx'
 
-interface Analytics {
-  rcSuccess: number
-  rcInProgress: number
-  dcSuccess: number
-  dcInProgress: number
-  dcFailed: number
-  totalCommands: number
-  lastUpdated: Date | null
-}
+const reportsStore = useReportsStore()
 
-interface NocsData {
-  nocsName: string
-  rcSuccess: number
-  rcInProgress: number
-  dcSuccess: number
-  dcInProgress: number
-  dcFailed: number
-  total: number
-}
-
-const loading = ref(false)
-const error = ref<string | null>(null)
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 const snackbarColor = ref('success')
-
-const analytics = ref<Analytics>({
-  rcSuccess: 0,
-  rcInProgress: 0,
-  dcSuccess: 0,
-  dcInProgress: 0,
-  dcFailed: 0,
-  totalCommands: 0,
-  lastUpdated: null
-})
-
-const nocsData = ref<NocsData[]>([])
 
 const headers = [
   { title: 'NOCS Name', key: 'nocsName', align: 'start' as const },
@@ -486,94 +465,11 @@ const headers = [
 ]
 
 const fetchData = async () => {
-  loading.value = true
-  error.value = null
+  const result = await reportsStore.fetchAnalytics()
 
-  try {
-    const response = await reportsApi.getRCDCAnalytics()
-    const data = response.data
-
-    // Process the data to calculate analytics
-    const stats: Analytics = {
-      rcSuccess: 0,
-      rcInProgress: 0,
-      dcSuccess: 0,
-      dcInProgress: 0,
-      dcFailed: 0,
-      totalCommands: data.length,
-      lastUpdated: new Date()
-    }
-
-    // Calculate NOCS-wise statistics
-    const nocsMap: Record<string, NocsData> = {}
-
-    data.forEach((row: any) => {
-      const commandType = row.COMMAND_TYPE?.trim()
-      const commandStatus = row.COMMAND_STATUS?.trim()
-      const nocsName = row.NOCS_NAME?.trim() || 'Unknown'
-
-      // Overall stats
-      if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMPLETED') {
-        stats.rcSuccess++
-      } else if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMINPROG') {
-        stats.rcInProgress++
-      } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMPLETED') {
-        stats.dcSuccess++
-      } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMINPROG') {
-        stats.dcInProgress++
-      } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'DISCARDED') {
-        stats.dcFailed++
-      }
-
-      // NOCS-wise stats
-      if (!nocsMap[nocsName]) {
-        nocsMap[nocsName] = {
-          nocsName,
-          rcSuccess: 0,
-          rcInProgress: 0,
-          dcSuccess: 0,
-          dcInProgress: 0,
-          dcFailed: 0,
-          total: 0
-        }
-      }
-
-      nocsMap[nocsName].total++
-
-      if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMPLETED') {
-        nocsMap[nocsName].rcSuccess++
-      } else if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMINPROG') {
-        nocsMap[nocsName].rcInProgress++
-      } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMPLETED') {
-        nocsMap[nocsName].dcSuccess++
-      } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMINPROG') {
-        nocsMap[nocsName].dcInProgress++
-      } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'DISCARDED') {
-        nocsMap[nocsName].dcFailed++
-      }
-    })
-
-    // Convert NOCS map to array and sort by total commands (descending)
-    const nocsArray = Object.values(nocsMap).sort((a, b) => b.total - a.total)
-
-    analytics.value = stats
-    nocsData.value = nocsArray
-    error.value = null
-
-    snackbarMessage.value = 'Data refreshed successfully'
-    snackbarColor.value = 'success'
-    snackbar.value = true
-  } catch (err: any) {
-    console.error('Error fetching data:', err)
-    const errorMsg = err.response?.data || err.message
-    error.value = errorMsg
-
-    snackbarMessage.value = 'Failed to fetch data. Check if database is accessible.'
-    snackbarColor.value = 'error'
-    snackbar.value = true
-  } finally {
-    loading.value = false
-  }
+  snackbarMessage.value = result.message
+  snackbarColor.value = result.success ? 'success' : 'error'
+  snackbar.value = true
 }
 
 const calculateSuccessRate = (success: number, total: number): string => {
@@ -588,7 +484,7 @@ const formatDateTime = (date: Date): string => {
 const exportToExcel = () => {
   try {
     // Prepare data for Excel export
-    const excelData = nocsData.value.map(item => ({
+    const excelData = reportsStore.nocsData.map(item => ({
       'NOCS Name': item.nocsName,
       'Total Commands': item.total,
       'RC Success': item.rcSuccess,
@@ -641,7 +537,10 @@ const exportToExcel = () => {
 }
 
 onMounted(() => {
-  fetchData()
+  // Only fetch if data is not already loaded
+  if (reportsStore.nocsData.length === 0) {
+    fetchData()
+  }
 })
 </script>
 

@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import ReportPage from './pages/ReportPage';
 import QueryHistoryPage from './pages/QueryHistoryPage';
 import HistoryResultPage from './pages/HistoryResultPage';
+import RCDCAnalyticsPage from './pages/RCDCAnalyticsPage';
 import { ScrollArea } from './components/ui/scroll-area';
 import { Button } from './components/ui/button';
 import { cn } from './lib/utils';
@@ -51,6 +52,7 @@ const Navigation = () => {
   const location = useLocation();
   const currentReport = location.pathname.split('/reports/')[1];
   const isHistoryPage = location.pathname.startsWith('/history');
+  const isAnalyticsPage = location.pathname === '/analytics';
   const [searchTerm, setSearchTerm] = useState('');
   const [badgeCount, setBadgeCount] = useState(0);
 
@@ -117,6 +119,22 @@ const Navigation = () => {
                 {badgeCount}
               </span>
             )}
+          </Button>
+        </Link>
+      </div>
+
+      {/* RC/DC Analytics Link */}
+      <div className="p-3 border-b border-gray-200">
+        <Link to="/analytics" className="block">
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start text-left font-normal text-sm",
+              isAnalyticsPage && "bg-gray-100 text-gray-900 font-medium"
+            )}
+          >
+            <span className="mr-2">📊</span>
+            <span>RC/DC Analytics</span>
           </Button>
         </Link>
       </div>
@@ -220,6 +238,7 @@ const App = () => {
               <Route path="/reports/:reportName" element={<ReportPage />} />
               <Route path="/history" element={<QueryHistoryPage />} />
               <Route path="/history/:jobId" element={<HistoryResultPage />} />
+              <Route path="/analytics" element={<RCDCAnalyticsPage />} />
               <Route path="/" element={
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">

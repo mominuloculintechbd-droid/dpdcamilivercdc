@@ -15,6 +15,9 @@ export const reportsApi = {
   getRCDCAnalytics: () => {
     return apiClient.get('/reports/rc_dc_analytics_summary')
   },
+  getMeterWiseCommands: () => {
+    return apiClient.get('/reports/meter_wise_commands')
+  },
 }
 
 export default apiClient

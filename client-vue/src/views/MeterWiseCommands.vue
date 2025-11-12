@@ -355,12 +355,12 @@
               >
                 <template v-slot:item.COMMAND_TYPE="{ item }">
                   <v-chip
-                    :color="item.COMMAND_TYPE === 'D1-RemoteConnect' ? 'success' : 'error'"
+                    :color="item.COMMAND_TYPE?.trim() === 'D1-RemoteConnect' ? 'success' : 'error'"
                     variant="flat"
                     size="small"
                     class="font-weight-bold"
                   >
-                    {{ item.COMMAND_TYPE === 'D1-RemoteConnect' ? 'RC' : 'DC' }}
+                    {{ item.COMMAND_TYPE?.trim() === 'D1-RemoteConnect' ? 'RC' : 'DC' }}
                   </v-chip>
                 </template>
                 <template v-slot:item.COMMAND_STATUS="{ item }">
@@ -613,17 +613,26 @@ const getMeterStatus = (commandType: string, commandStatus: string): string => {
   const type = commandType?.trim()
   const status = commandStatus?.trim()
 
-  if (type === 'D1-RemoteConnect' && status === 'COMPLETED') {
+  // Debug logging
+  console.log('getMeterStatus - Type:', `"${type}"`, 'Status:', `"${status}"`)
+
+  // Check if it's a Remote Connect command
+  const isRemoteConnect = type === 'D1-RemoteConnect'
+  const isRemoteDisconnect = type === 'D1-RemoteDisconnect'
+
+  if (isRemoteConnect && status === 'COMPLETED') {
     return 'Connected'
-  } else if (type === 'D1-RemoteDisconnect' && status === 'COMPLETED') {
+  } else if (isRemoteDisconnect && status === 'COMPLETED') {
     return 'Disconnected'
-  } else if (type === 'D1-RemoteConnect' && status === 'COMINPROG') {
+  } else if (isRemoteConnect && status === 'COMINPROG') {
     return 'RC In Progress'
-  } else if (type === 'D1-RemoteDisconnect' && status === 'COMINPROG') {
+  } else if (isRemoteDisconnect && status === 'COMINPROG') {
     return 'DC In Progress'
   } else if (status === 'DISCARDED') {
     return 'Discarded'
   } else {
+    // If we can't match, show what we received for debugging
+    console.warn('Unknown meter status combination:', { type, status })
     return 'Unknown'
   }
 }
@@ -666,7 +675,7 @@ const exportToExcel = () => {
       'NOCS Name': item.NOCS_NAME,
       'Meter Number': item.MSN,
       'Customer ID': item.OLD_CONSUMER_ID,
-      'Command Type': item.COMMAND_TYPE === 'D1-RemoteConnect' ? 'RC' : 'DC',
+      'Command Type': item.COMMAND_TYPE?.trim() === 'D1-RemoteConnect' ? 'RC' : 'DC',
       'Command Status': getStatusLabel(item.COMMAND_STATUS),
       'Meter Status': getMeterStatus(item.COMMAND_TYPE, item.COMMAND_STATUS),
       'Trigger Date': item.DATE_OF_COMMAND_TRIGGER,

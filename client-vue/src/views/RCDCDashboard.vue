@@ -529,7 +529,7 @@ const exportToExcel = () => {
       'RC In Progress %': calculateSuccessRate(item.rcInProgress, item.rcSuccess + item.rcInProgress),
       'DC Success': item.dcSuccess,
       'DC In Progress': item.dcInProgress,
-      'DC Failed': item.dcFailed
+      'DC Discarded': item.dcFailed
     }))
 
     // Create workbook and worksheet
@@ -545,7 +545,7 @@ const exportToExcel = () => {
       { wch: 18 }, // RC In Progress %
       { wch: 12 }, // DC Success
       { wch: 15 }, // DC In Progress
-      { wch: 12 }  // DC Failed
+      { wch: 12 }  // DC Discarded
     ]
     ws['!cols'] = colWidths
 
@@ -591,7 +591,7 @@ const exportFullReportToExcel = () => {
       ['RC Success Rate', calculateSuccessRate(reportsStore.analytics.rcSuccess, reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress) + '%'],
       ['DC Success', reportsStore.analytics.dcSuccess],
       ['DC In Progress', reportsStore.analytics.dcInProgress],
-      ['DC Failed', reportsStore.analytics.dcFailed],
+      ['DC Discarded', reportsStore.analytics.dcFailed],
       ['DC Success Rate', calculateSuccessRate(reportsStore.analytics.dcSuccess, reportsStore.analytics.dcSuccess + reportsStore.analytics.dcInProgress + reportsStore.analytics.dcFailed) + '%'],
       ['Overall Success Rate', calculateSuccessRate(reportsStore.analytics.rcSuccess + reportsStore.analytics.dcSuccess, reportsStore.analytics.totalCommands) + '%']
     ]
@@ -609,7 +609,7 @@ const exportFullReportToExcel = () => {
       'RC In Progress %': calculateSuccessRate(item.rcInProgress, item.rcSuccess + item.rcInProgress),
       'DC Success': item.dcSuccess,
       'DC In Progress': item.dcInProgress,
-      'DC Failed': item.dcFailed
+      'DC Discarded': item.dcFailed
     }))
 
     const wsNocs = XLSX.utils.json_to_sheet(nocsData)
@@ -664,7 +664,7 @@ const exportToPDF = () => {
       ['', ''],
       ['DC Success', reportsStore.analytics.dcSuccess.toString()],
       ['DC In Progress', reportsStore.analytics.dcInProgress.toString()],
-      ['DC Failed', reportsStore.analytics.dcFailed.toString()],
+      ['DC Discarded', reportsStore.analytics.dcFailed.toString()],
       ['DC Success Rate', calculateSuccessRate(reportsStore.analytics.dcSuccess, reportsStore.analytics.dcSuccess + reportsStore.analytics.dcInProgress + reportsStore.analytics.dcFailed) + '%'],
       ['', ''],
       ['Overall Success Rate', calculateSuccessRate(reportsStore.analytics.rcSuccess + reportsStore.analytics.dcSuccess, reportsStore.analytics.totalCommands) + '%']
@@ -700,7 +700,7 @@ const exportToPDF = () => {
 
     autoTable(doc, {
       startY: finalY + 20,
-      head: [['NOCS', 'RC Success', 'RC %', 'RC Progress', 'DC Success', 'DC Progress', 'DC Failed']],
+      head: [['NOCS', 'RC Success', 'RC %', 'RC Progress', 'DC Success', 'DC Progress', 'DC Discarded']],
       body: nocsTableData,
       theme: 'striped',
       headStyles: { fillColor: [102, 126, 234], fontStyle: 'bold', fontSize: 9 },

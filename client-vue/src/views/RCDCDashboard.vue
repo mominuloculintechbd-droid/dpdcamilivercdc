@@ -523,7 +523,6 @@ const exportToExcel = () => {
     // Prepare data for Excel export
     const excelData = reportsStore.nocsData.map(item => ({
       'NOCS Name': item.nocsName,
-      'Total Commands': item.total,
       'RC Success': item.rcSuccess,
       'RC Success %': calculateSuccessRate(item.rcSuccess, item.rcSuccess + item.rcInProgress),
       'RC In Progress': item.rcInProgress,
@@ -540,7 +539,6 @@ const exportToExcel = () => {
     // Set column widths
     const colWidths = [
       { wch: 25 }, // NOCS Name
-      { wch: 15 }, // Total Commands
       { wch: 12 }, // RC Success
       { wch: 15 }, // RC Success %
       { wch: 15 }, // RC In Progress
@@ -605,7 +603,6 @@ const exportFullReportToExcel = () => {
     // NOCS-wise Breakdown Sheet
     const nocsData = reportsStore.nocsData.map(item => ({
       'NOCS Name': item.nocsName,
-      'Total': item.total,
       'RC Success': item.rcSuccess,
       'RC Success %': calculateSuccessRate(item.rcSuccess, item.rcSuccess + item.rcInProgress),
       'RC In Progress': item.rcInProgress,
@@ -617,7 +614,7 @@ const exportFullReportToExcel = () => {
 
     const wsNocs = XLSX.utils.json_to_sheet(nocsData)
     wsNocs['!cols'] = [
-      { wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 15 },
+      { wch: 25 }, { wch: 12 }, { wch: 15 },
       { wch: 15 }, { wch: 18 }, { wch: 12 }, { wch: 15 }, { wch: 12 }
     ]
     XLSX.utils.book_append_sheet(wb, wsNocs, 'NOCS Breakdown')
@@ -693,7 +690,6 @@ const exportToPDF = () => {
 
     const nocsTableData = reportsStore.nocsData.map(item => [
       item.nocsName,
-      item.total.toString(),
       item.rcSuccess.toString(),
       calculateSuccessRate(item.rcSuccess, item.rcSuccess + item.rcInProgress) + '%',
       item.rcInProgress.toString(),
@@ -704,20 +700,19 @@ const exportToPDF = () => {
 
     autoTable(doc, {
       startY: finalY + 20,
-      head: [['NOCS', 'Total', 'RC Success', 'RC %', 'RC Progress', 'DC Success', 'DC Progress', 'DC Failed']],
+      head: [['NOCS', 'RC Success', 'RC %', 'RC Progress', 'DC Success', 'DC Progress', 'DC Failed']],
       body: nocsTableData,
       theme: 'striped',
       headStyles: { fillColor: [102, 126, 234], fontStyle: 'bold', fontSize: 9 },
       bodyStyles: { fontSize: 8 },
       columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: 18, halign: 'center' },
-        2: { cellWidth: 18, halign: 'center' },
-        3: { cellWidth: 20, halign: 'center' },
-        4: { cellWidth: 18, halign: 'center' },
-        5: { cellWidth: 18, halign: 'center' },
-        6: { cellWidth: 18, halign: 'center' },
-        7: { cellWidth: 18, halign: 'center' }
+        0: { cellWidth: 60 },
+        1: { cellWidth: 20, halign: 'center' },
+        2: { cellWidth: 20, halign: 'center' },
+        3: { cellWidth: 22, halign: 'center' },
+        4: { cellWidth: 20, halign: 'center' },
+        5: { cellWidth: 22, halign: 'center' },
+        6: { cellWidth: 20, halign: 'center' }
       }
     })
 

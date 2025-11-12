@@ -704,7 +704,7 @@ const exportToPDF = () => {
 
     autoTable(doc, {
       startY: finalY + 20,
-      head: [['NOCS', 'Total', 'RC ✓', 'RC %', 'RC ⏳', 'DC ✓', 'DC ⏳', 'DC ✗']],
+      head: [['NOCS', 'Total', 'RC Success', 'RC %', 'RC Progress', 'DC Success', 'DC Progress', 'DC Failed']],
       body: nocsTableData,
       theme: 'striped',
       headStyles: { fillColor: [102, 126, 234], fontStyle: 'bold', fontSize: 9 },

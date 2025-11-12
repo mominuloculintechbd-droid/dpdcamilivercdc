@@ -84,19 +84,54 @@
             </div>
           </v-col>
           <v-col cols="12" md="4" class="text-md-right">
-            <v-btn
-              color="white"
-              size="large"
-              :loading="reportsStore.analyticsLoading"
-              @click="fetchData"
-              elevation="0"
-              rounded="pill"
-              class="refresh-btn px-6"
-              variant="flat"
-            >
-              <v-icon start class="mr-2">mdi-refresh</v-icon>
-              <span class="font-weight-bold">Refresh</span>
-            </v-btn>
+            <div class="d-flex flex-wrap ga-2 justify-end">
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    color="white"
+                    size="large"
+                    elevation="0"
+                    rounded="pill"
+                    class="download-header-btn px-6"
+                    variant="flat"
+                    v-bind="props"
+                  >
+                    <v-icon start class="mr-2">mdi-download</v-icon>
+                    <span class="font-weight-bold">Download</span>
+                    <v-icon end class="ml-2">mdi-chevron-down</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item @click="exportFullReportToExcel">
+                    <template v-slot:prepend>
+                      <v-icon color="success">mdi-microsoft-excel</v-icon>
+                    </template>
+                    <v-list-item-title>Excel Report</v-list-item-title>
+                    <v-list-item-subtitle>Complete statistics with summary</v-list-item-subtitle>
+                  </v-list-item>
+                  <v-list-item @click="exportToPDF">
+                    <template v-slot:prepend>
+                      <v-icon color="error">mdi-file-pdf-box</v-icon>
+                    </template>
+                    <v-list-item-title>PDF Report</v-list-item-title>
+                    <v-list-item-subtitle>Formatted report with tables</v-list-item-subtitle>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+              <v-btn
+                color="white"
+                size="large"
+                :loading="reportsStore.analyticsLoading"
+                @click="fetchData"
+                elevation="0"
+                rounded="pill"
+                class="refresh-btn px-6"
+                variant="flat"
+              >
+                <v-icon start class="mr-2">mdi-refresh</v-icon>
+                <span class="font-weight-bold">Refresh</span>
+              </v-btn>
+            </div>
           </v-col>
         </v-row>
       </div>
@@ -446,6 +481,8 @@
 import { ref, onMounted } from 'vue'
 import { useReportsStore } from '../stores/reportsStore'
 import * as XLSX from 'xlsx'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 const reportsStore = useReportsStore()
 
@@ -531,6 +568,169 @@ const exportToExcel = () => {
   } catch (err) {
     console.error('Error exporting to Excel:', err)
     snackbarMessage.value = 'Failed to export data to Excel'
+    snackbarColor.value = 'error'
+    snackbar.value = true
+  }
+}
+
+const exportFullReportToExcel = () => {
+  try {
+    const wb = XLSX.utils.book_new()
+    const date = new Date()
+    const dateStr = date.toISOString().split('T')[0]
+    const timeStr = date.toLocaleString()
+
+    // Summary Sheet
+    const summaryData = [
+      ['DPDC RC/DC Command Statistics Report'],
+      ['Generated:', timeStr],
+      [''],
+      ['Overall Statistics'],
+      ['Metric', 'Value'],
+      ['Total Commands', reportsStore.analytics.totalCommands],
+      ['RC Success', reportsStore.analytics.rcSuccess],
+      ['RC In Progress', reportsStore.analytics.rcInProgress],
+      ['RC Success Rate', calculateSuccessRate(reportsStore.analytics.rcSuccess, reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress) + '%'],
+      ['DC Success', reportsStore.analytics.dcSuccess],
+      ['DC In Progress', reportsStore.analytics.dcInProgress],
+      ['DC Failed', reportsStore.analytics.dcFailed],
+      ['DC Success Rate', calculateSuccessRate(reportsStore.analytics.dcSuccess, reportsStore.analytics.dcSuccess + reportsStore.analytics.dcInProgress + reportsStore.analytics.dcFailed) + '%'],
+      ['Overall Success Rate', calculateSuccessRate(reportsStore.analytics.rcSuccess + reportsStore.analytics.dcSuccess, reportsStore.analytics.totalCommands) + '%']
+    ]
+
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData)
+    wsSummary['!cols'] = [{ wch: 30 }, { wch: 20 }]
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary')
+
+    // NOCS-wise Breakdown Sheet
+    const nocsData = reportsStore.nocsData.map(item => ({
+      'NOCS Name': item.nocsName,
+      'Total': item.total,
+      'RC Success': item.rcSuccess,
+      'RC Success %': calculateSuccessRate(item.rcSuccess, item.rcSuccess + item.rcInProgress),
+      'RC In Progress': item.rcInProgress,
+      'RC In Progress %': calculateSuccessRate(item.rcInProgress, item.rcSuccess + item.rcInProgress),
+      'DC Success': item.dcSuccess,
+      'DC In Progress': item.dcInProgress,
+      'DC Failed': item.dcFailed
+    }))
+
+    const wsNocs = XLSX.utils.json_to_sheet(nocsData)
+    wsNocs['!cols'] = [
+      { wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 15 },
+      { wch: 15 }, { wch: 18 }, { wch: 12 }, { wch: 15 }, { wch: 12 }
+    ]
+    XLSX.utils.book_append_sheet(wb, wsNocs, 'NOCS Breakdown')
+
+    // Save file
+    const filename = `RC_DC_Statistics_Report_${dateStr}.xlsx`
+    XLSX.writeFile(wb, filename)
+
+    snackbarMessage.value = 'Complete Excel report downloaded successfully'
+    snackbarColor.value = 'success'
+    snackbar.value = true
+  } catch (err) {
+    console.error('Error exporting full report to Excel:', err)
+    snackbarMessage.value = 'Failed to export full report to Excel'
+    snackbarColor.value = 'error'
+    snackbar.value = true
+  }
+}
+
+const exportToPDF = () => {
+  try {
+    const doc = new jsPDF()
+    const date = new Date()
+    const dateStr = date.toLocaleDateString()
+    const timeStr = date.toLocaleTimeString()
+
+    // Title
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('DPDC RC/DC Command Statistics', 14, 20)
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Generated: ${dateStr} ${timeStr}`, 14, 28)
+
+    // Summary Statistics
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Overall Statistics', 14, 40)
+
+    const summaryData = [
+      ['Total Commands', reportsStore.analytics.totalCommands.toString()],
+      ['', ''],
+      ['RC Success', reportsStore.analytics.rcSuccess.toString()],
+      ['RC In Progress', reportsStore.analytics.rcInProgress.toString()],
+      ['RC Success Rate', calculateSuccessRate(reportsStore.analytics.rcSuccess, reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress) + '%'],
+      ['', ''],
+      ['DC Success', reportsStore.analytics.dcSuccess.toString()],
+      ['DC In Progress', reportsStore.analytics.dcInProgress.toString()],
+      ['DC Failed', reportsStore.analytics.dcFailed.toString()],
+      ['DC Success Rate', calculateSuccessRate(reportsStore.analytics.dcSuccess, reportsStore.analytics.dcSuccess + reportsStore.analytics.dcInProgress + reportsStore.analytics.dcFailed) + '%'],
+      ['', ''],
+      ['Overall Success Rate', calculateSuccessRate(reportsStore.analytics.rcSuccess + reportsStore.analytics.dcSuccess, reportsStore.analytics.totalCommands) + '%']
+    ]
+
+    autoTable(doc, {
+      startY: 45,
+      head: [['Metric', 'Value']],
+      body: summaryData,
+      theme: 'grid',
+      headStyles: { fillColor: [102, 126, 234], fontStyle: 'bold' },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: 80 },
+        1: { cellWidth: 40, halign: 'right' }
+      }
+    })
+
+    // NOCS-wise Breakdown
+    const finalY = (doc as any).lastAutoTable.finalY || 45
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('NOCS-wise Breakdown', 14, finalY + 15)
+
+    const nocsTableData = reportsStore.nocsData.map(item => [
+      item.nocsName,
+      item.total.toString(),
+      item.rcSuccess.toString(),
+      calculateSuccessRate(item.rcSuccess, item.rcSuccess + item.rcInProgress) + '%',
+      item.rcInProgress.toString(),
+      item.dcSuccess.toString(),
+      item.dcInProgress.toString(),
+      item.dcFailed.toString()
+    ])
+
+    autoTable(doc, {
+      startY: finalY + 20,
+      head: [['NOCS', 'Total', 'RC ✓', 'RC %', 'RC ⏳', 'DC ✓', 'DC ⏳', 'DC ✗']],
+      body: nocsTableData,
+      theme: 'striped',
+      headStyles: { fillColor: [102, 126, 234], fontStyle: 'bold', fontSize: 9 },
+      bodyStyles: { fontSize: 8 },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 18, halign: 'center' },
+        2: { cellWidth: 18, halign: 'center' },
+        3: { cellWidth: 20, halign: 'center' },
+        4: { cellWidth: 18, halign: 'center' },
+        5: { cellWidth: 18, halign: 'center' },
+        6: { cellWidth: 18, halign: 'center' },
+        7: { cellWidth: 18, halign: 'center' }
+      }
+    })
+
+    // Save PDF
+    const filename = `RC_DC_Statistics_Report_${date.toISOString().split('T')[0]}.pdf`
+    doc.save(filename)
+
+    snackbarMessage.value = 'PDF report downloaded successfully'
+    snackbarColor.value = 'success'
+    snackbar.value = true
+  } catch (err) {
+    console.error('Error exporting to PDF:', err)
+    snackbarMessage.value = 'Failed to export PDF report'
     snackbarColor.value = 'error'
     snackbar.value = true
   }
@@ -622,7 +822,8 @@ onMounted(() => {
   border-radius: 50%;
 }
 
-.refresh-btn {
+.refresh-btn,
+.download-header-btn {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%) !important;
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.8) !important;
@@ -630,13 +831,15 @@ onMounted(() => {
   transition: all 0.3s ease !important;
 }
 
-.refresh-btn:hover {
+.refresh-btn:hover,
+.download-header-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2) !important;
   border-color: rgba(255, 255, 255, 1) !important;
 }
 
-.refresh-btn span {
+.refresh-btn span,
+.download-header-btn span {
   color: #667eea !important;
 }
 

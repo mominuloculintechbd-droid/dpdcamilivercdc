@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Use local network IP for production deployment
-const API_BASE_URL = 'http://localhost:3001/api'
+const API_BASE_URL = 'http://172.16.20.112:3001/api'
 
 
 const apiClient = axios.create({

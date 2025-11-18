@@ -74,7 +74,8 @@ export const useReportsStore = defineStore('reports', () => {
     }
   }
 
-  // Fetch NOCS analytics
+  // Fetch NOCS analytics - OPTIMIZED VERSION
+  // Database now returns pre-aggregated data, eliminating client-side processing
   const fetchAnalytics = async () => {
     analyticsLoading.value = true
     analyticsError.value = null
@@ -83,68 +84,27 @@ export const useReportsStore = defineStore('reports', () => {
       const response = await reportsApi.getRCDCAnalytics()
       const data = response.data
 
-      // Process the data to calculate analytics
+      // Data is already aggregated by the database - just map and sum
+      const nocsArray: NocsData[] = data.map((row: any) => ({
+        nocsName: row.NOCS_NAME?.trim() || 'Unknown',
+        rcSuccess: row.RC_SUCCESS || 0,
+        rcInProgress: row.RC_IN_PROGRESS || 0,
+        dcSuccess: row.DC_SUCCESS || 0,
+        dcInProgress: row.DC_IN_PROGRESS || 0,
+        dcFailed: row.DC_FAILED || 0,
+        total: row.TOTAL || 0
+      }))
+
+      // Calculate overall statistics by summing NOCS totals
       const stats: Analytics = {
-        rcSuccess: 0,
-        rcInProgress: 0,
-        dcSuccess: 0,
-        dcInProgress: 0,
-        dcFailed: 0,
-        totalCommands: data.length,
+        rcSuccess: nocsArray.reduce((sum, nocs) => sum + nocs.rcSuccess, 0),
+        rcInProgress: nocsArray.reduce((sum, nocs) => sum + nocs.rcInProgress, 0),
+        dcSuccess: nocsArray.reduce((sum, nocs) => sum + nocs.dcSuccess, 0),
+        dcInProgress: nocsArray.reduce((sum, nocs) => sum + nocs.dcInProgress, 0),
+        dcFailed: nocsArray.reduce((sum, nocs) => sum + nocs.dcFailed, 0),
+        totalCommands: nocsArray.reduce((sum, nocs) => sum + nocs.total, 0),
         lastUpdated: new Date()
       }
-
-      // Calculate NOCS-wise statistics
-      const nocsMap: Record<string, NocsData> = {}
-
-      data.forEach((row: any) => {
-        const commandType = row.COMMAND_TYPE?.trim()
-        const commandStatus = row.COMMAND_STATUS?.trim()
-        const nocsName = row.NOCS_NAME?.trim() || 'Unknown'
-
-        // Overall stats
-        if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMPLETED') {
-          stats.rcSuccess++
-        } else if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMINPROG') {
-          stats.rcInProgress++
-        } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMPLETED') {
-          stats.dcSuccess++
-        } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMINPROG') {
-          stats.dcInProgress++
-        } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'DISCARDED') {
-          stats.dcFailed++
-        }
-
-        // NOCS-wise stats
-        if (!nocsMap[nocsName]) {
-          nocsMap[nocsName] = {
-            nocsName,
-            rcSuccess: 0,
-            rcInProgress: 0,
-            dcSuccess: 0,
-            dcInProgress: 0,
-            dcFailed: 0,
-            total: 0
-          }
-        }
-
-        nocsMap[nocsName].total++
-
-        if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMPLETED') {
-          nocsMap[nocsName].rcSuccess++
-        } else if (commandType === 'D1-RemoteConnect' && commandStatus === 'COMINPROG') {
-          nocsMap[nocsName].rcInProgress++
-        } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMPLETED') {
-          nocsMap[nocsName].dcSuccess++
-        } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'COMINPROG') {
-          nocsMap[nocsName].dcInProgress++
-        } else if (commandType === 'D1-RemoteDisconnect' && commandStatus === 'DISCARDED') {
-          nocsMap[nocsName].dcFailed++
-        }
-      })
-
-      // Convert NOCS map to array and sort by total commands (descending)
-      const nocsArray = Object.values(nocsMap).sort((a, b) => b.total - a.total)
 
       analytics.value = stats
       nocsData.value = nocsArray

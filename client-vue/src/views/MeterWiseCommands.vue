@@ -515,7 +515,7 @@ const filteredData = computed(() => {
     data = data.filter(item => {
       const trimmed = item.COMMAND_TYPE?.trim()
       const matches = trimmed === filters.value.commandType
-      if (!matches && item.COMMAND_TYPE) {
+      if (!matches && item.COMMAND_TYPE && filters.value.commandType) {
         console.log('Not matching:', `"${item.COMMAND_TYPE}" (length: ${item.COMMAND_TYPE.length})`, 'vs', `"${filters.value.commandType}" (length: ${filters.value.commandType.length})`)
       }
       return matches

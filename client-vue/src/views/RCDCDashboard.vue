@@ -146,7 +146,8 @@
         <v-col cols="12" sm="6" md="3">
           <v-card class="stat-card" elevation="3" rounded="lg">
             <v-card-text class="pa-5">
-              <div class="d-flex align-center mb-3">
+              <v-skeleton-loader v-if="reportsStore.analyticsLoading" type="article"></v-skeleton-loader>
+              <div v-else class="d-flex align-center mb-3">
                 <v-avatar color="deep-purple-lighten-5" size="48">
                   <v-icon color="deep-purple" size="24">mdi-chart-bar</v-icon>
                 </v-avatar>
@@ -155,7 +156,7 @@
                   <h2 class="text-h4 font-weight-bold">{{ reportsStore.analytics.totalCommands }}</h2>
                 </div>
               </div>
-              <v-progress-linear color="deep-purple" :model-value="100" height="4" rounded></v-progress-linear>
+              <v-progress-linear v-if="!reportsStore.analyticsLoading" color="deep-purple" :model-value="100" height="4" rounded></v-progress-linear>
             </v-card-text>
           </v-card>
         </v-col>
@@ -164,7 +165,8 @@
         <v-col cols="12" sm="6" md="3">
           <v-card class="stat-card" elevation="3" rounded="lg">
             <v-card-text class="pa-5">
-              <div class="d-flex align-center mb-3">
+              <v-skeleton-loader v-if="reportsStore.analyticsLoading" type="article"></v-skeleton-loader>
+              <div v-else class="d-flex align-center mb-3">
                 <v-avatar color="green-lighten-5" size="48">
                   <v-icon color="green" size="24">mdi-power-plug</v-icon>
                 </v-avatar>
@@ -176,6 +178,7 @@
                 </div>
               </div>
               <v-progress-linear
+                v-if="!reportsStore.analyticsLoading"
                 color="green"
                 :model-value="parseFloat(calculateSuccessRate(reportsStore.analytics.rcSuccess, reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress))"
                 height="4"
@@ -189,7 +192,8 @@
         <v-col cols="12" sm="6" md="3">
           <v-card class="stat-card" elevation="3" rounded="lg">
             <v-card-text class="pa-5">
-              <div class="d-flex align-center mb-3">
+              <v-skeleton-loader v-if="reportsStore.analyticsLoading" type="article"></v-skeleton-loader>
+              <div v-else class="d-flex align-center mb-3">
                 <v-avatar color="blue-lighten-5" size="48">
                   <v-icon color="blue" size="24">mdi-power-plug-off</v-icon>
                 </v-avatar>
@@ -201,6 +205,7 @@
                 </div>
               </div>
               <v-progress-linear
+                v-if="!reportsStore.analyticsLoading"
                 color="blue"
                 :model-value="parseFloat(calculateSuccessRate(reportsStore.analytics.dcSuccess, reportsStore.analytics.dcSuccess + reportsStore.analytics.dcInProgress + reportsStore.analytics.dcFailed))"
                 height="4"
@@ -214,7 +219,8 @@
         <v-col cols="12" sm="6" md="3">
           <v-card class="stat-card" elevation="3" rounded="lg">
             <v-card-text class="pa-5">
-              <div class="d-flex align-center mb-3">
+              <v-skeleton-loader v-if="reportsStore.analyticsLoading" type="article"></v-skeleton-loader>
+              <div v-else class="d-flex align-center mb-3">
                 <v-avatar color="orange-lighten-5" size="48">
                   <v-icon color="orange" size="24">mdi-check-all</v-icon>
                 </v-avatar>
@@ -226,6 +232,7 @@
                 </div>
               </div>
               <v-progress-linear
+                v-if="!reportsStore.analyticsLoading"
                 color="orange"
                 :model-value="parseFloat(calculateSuccessRate(reportsStore.analytics.rcSuccess + reportsStore.analytics.dcSuccess, reportsStore.analytics.totalCommands))"
                 height="4"
@@ -248,24 +255,27 @@
         <v-col cols="12" md="6">
           <v-card class="modern-card" elevation="2" rounded="lg">
             <v-card-text class="pa-6">
-              <div class="d-flex justify-space-between align-center mb-4">
-                <div>
-                  <div class="d-flex align-center mb-2">
-                    <v-icon color="success" size="20" class="mr-2">mdi-check-circle</v-icon>
-                    <span class="text-overline font-weight-bold">Completed</span>
+              <v-skeleton-loader v-if="reportsStore.analyticsLoading" type="article, actions"></v-skeleton-loader>
+              <template v-else>
+                <div class="d-flex justify-space-between align-center mb-4">
+                  <div>
+                    <div class="d-flex align-center mb-2">
+                      <v-icon color="success" size="20" class="mr-2">mdi-check-circle</v-icon>
+                      <span class="text-overline font-weight-bold">Completed</span>
+                    </div>
+                    <h1 class="text-h2 font-weight-bold text-success">{{ reportsStore.analytics.rcSuccess }}</h1>
+                    <p class="text-caption text-medium-emphasis mt-1">Successfully connected</p>
                   </div>
-                  <h1 class="text-h2 font-weight-bold text-success">{{ reportsStore.analytics.rcSuccess }}</h1>
-                  <p class="text-caption text-medium-emphasis mt-1">Successfully connected</p>
+                  <v-avatar color="success-lighten-4" size="80">
+                    <v-icon color="success" size="40">mdi-check-circle-outline</v-icon>
+                  </v-avatar>
                 </div>
-                <v-avatar color="success-lighten-4" size="80">
-                  <v-icon color="success" size="40">mdi-check-circle-outline</v-icon>
-                </v-avatar>
-              </div>
-              <v-divider class="my-3"></v-divider>
-              <div class="text-caption text-medium-emphasis">
-                <v-icon size="16" class="mr-1">mdi-trending-up</v-icon>
-                {{ reportsStore.analytics.rcSuccess }} of {{ reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress }} total
-              </div>
+                <v-divider class="my-3"></v-divider>
+                <div class="text-caption text-medium-emphasis">
+                  <v-icon size="16" class="mr-1">mdi-trending-up</v-icon>
+                  {{ reportsStore.analytics.rcSuccess }} of {{ reportsStore.analytics.rcSuccess + reportsStore.analytics.rcInProgress }} total
+                </div>
+              </template>
             </v-card-text>
           </v-card>
         </v-col>
@@ -273,24 +283,27 @@
         <v-col cols="12" md="6">
           <v-card class="modern-card" elevation="2" rounded="lg">
             <v-card-text class="pa-6">
-              <div class="d-flex justify-space-between align-center mb-4">
-                <div>
-                  <div class="d-flex align-center mb-2">
-                    <v-icon color="warning" size="20" class="mr-2">mdi-clock-outline</v-icon>
-                    <span class="text-overline font-weight-bold">In Progress</span>
+              <v-skeleton-loader v-if="reportsStore.analyticsLoading" type="article, actions"></v-skeleton-loader>
+              <template v-else>
+                <div class="d-flex justify-space-between align-center mb-4">
+                  <div>
+                    <div class="d-flex align-center mb-2">
+                      <v-icon color="warning" size="20" class="mr-2">mdi-clock-outline</v-icon>
+                      <span class="text-overline font-weight-bold">In Progress</span>
+                    </div>
+                    <h1 class="text-h2 font-weight-bold text-warning">{{ reportsStore.analytics.rcInProgress }}</h1>
+                    <p class="text-caption text-medium-emphasis mt-1">Currently processing</p>
                   </div>
-                  <h1 class="text-h2 font-weight-bold text-warning">{{ reportsStore.analytics.rcInProgress }}</h1>
-                  <p class="text-caption text-medium-emphasis mt-1">Currently processing</p>
+                  <v-avatar color="warning-lighten-4" size="80">
+                    <v-icon color="warning" size="40">mdi-sync</v-icon>
+                  </v-avatar>
                 </div>
-                <v-avatar color="warning-lighten-4" size="80">
-                  <v-icon color="warning" size="40">mdi-sync</v-icon>
-                </v-avatar>
-              </div>
-              <v-divider class="my-3"></v-divider>
-              <div class="text-caption text-medium-emphasis">
-                <v-icon size="16" class="mr-1">mdi-timer-sand</v-icon>
-                Pending completion
-              </div>
+                <v-divider class="my-3"></v-divider>
+                <div class="text-caption text-medium-emphasis">
+                  <v-icon size="16" class="mr-1">mdi-timer-sand</v-icon>
+                  Pending completion
+                </div>
+              </template>
             </v-card-text>
           </v-card>
         </v-col>
@@ -364,7 +377,7 @@
       </v-row>
 
       <!-- NOCS-wise Report Table -->
-      <v-row v-if="reportsStore.nocsData.length > 0" class="mb-6">
+      <v-row v-if="reportsStore.nocsData.length > 0 || reportsStore.analyticsLoading" class="mb-6">
         <v-col cols="12">
           <v-card elevation="3" rounded="lg" class="modern-card">
             <v-card-title class="pa-6 pb-4">
@@ -383,7 +396,7 @@
                   variant="flat"
                   size="default"
                   @click="exportToExcel"
-                  :disabled="reportsStore.nocsData.length === 0"
+                  :disabled="reportsStore.nocsData.length === 0 || reportsStore.analyticsLoading"
                   rounded="lg"
                   class="download-btn"
                 >
@@ -394,7 +407,9 @@
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text class="pa-0">
+              <v-skeleton-loader v-if="reportsStore.analyticsLoading" type="table"></v-skeleton-loader>
               <v-data-table
+                v-else
                 :headers="headers"
                 :items="reportsStore.nocsData"
                 :items-per-page="10"
